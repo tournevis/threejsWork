@@ -115,13 +115,15 @@ THREE.CustomBlending */
     	uniforms: {
     		time: { type: "f", value: 1.0 },
     		resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        size : { type: 'f', value: 40 }
+        size : { type: 'f', value: 40 },
+        u_tex : { type : 't', value: new THREE.ImageUtils.loadTexture( "img/ptc.png" )  }
     	},
     	attributes: {
     		vertexOpacity: { type: 'f', value: 1 },
     	},
     	vertexShader: glslify('../shader/particleVert.glsl'),
-    	fragmentShader: glslify('../shader/particleFrag.glsl')
+    	fragmentShader: glslify('../shader/particleFrag.glsl'),
+      transparent: true
 
     } );
       //img/this.particles.png

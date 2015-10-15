@@ -683,13 +683,15 @@ var Xp = (function (_THREE$Object3D) {
         uniforms: {
           time: { type: "f", value: 1.0 },
           resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-          size: { type: 'f', value: 40 }
+          size: { type: 'f', value: 40 },
+          u_tex: { type: 't', value: new THREE.ImageUtils.loadTexture("img/ptc.png") }
         },
         attributes: {
           vertexOpacity: { type: 'f', value: 1 }
         },
         vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = size;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
-        fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n  // gl_FragColor.r = 0.0;\n  // gl_FragColor.g = 1.0;\n  // gl_FragColor.b = 0.0;\n  // gl_FragColor.a = xPos;\n\n  vec2 mouse_distance = position -  (gl_FragCoord.xy / vec2(16.0,16.0));\n\tfloat alpha= 1.0 - length(mouse_distance);\n\n  gl_FragColor = vec4(position.x, position.y, 0.0, alpha);\n}\n"
+        fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nuniform sampler2D u_tex;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n\n  if ( position.x < 10.0 && position.y < 20.0 ){\n    vec4 texture = texture2D( u_tex, position.xy);\n    gl_FragColor = texture;\n  }\n  else {\n    gl_FragColor = vec4(0.0);\n  }\n\n\n//  gl_FragColor = vec4(1.0-position.x, 0.0, 0.0,.4-position.x);\n}\n",
+        transparent: true
 
       });
       //img/this.particles.png
