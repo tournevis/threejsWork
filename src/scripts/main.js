@@ -11,7 +11,8 @@ document.getElementById( "main" ).appendChild( engine.dom )
 const xp = new ( require( "xp/Xp" ) )()
 engine.scene.add( xp )
 
-sound.load( "mp3/StGermain_RoseRouge.mp3" )
+//sound.load( "mp3/StGermain_RoseRouge.mp3" )
+sound.load("mp3/ErikSatie_gymnopedie3.mp3")
 sound.on( "start", () => {
   loop.add( () => {
     xp.update( sound.getData() )

@@ -1,0 +1,18 @@
+uniform float time;
+uniform vec2 resolution;
+
+uniform float size;
+varying vec2 particle;
+varying vec3 vColor;
+varying float xPos;
+varying vec2 vUv;
+void main(){
+  vUv = uv;
+  gl_PointSize = size;
+  particle = vec2(position.xy);
+  vColor = vec3(position);
+  xPos = position.x;
+  gl_Position = projectionMatrix *
+                modelViewMatrix *
+                vec4(position,1.0);
+}

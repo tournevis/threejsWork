@@ -37,7 +37,7 @@ class Sound extends Emitter {
       this._source.connect( this._analyser )
       this._source.buffer = buffer
       this._source.connect( this._context.destination )
-    // this._source.start( 0 )
+     this._source.start( 0 )
 
       this.emit( "start" )
     }, () => {

@@ -1,38 +1,28 @@
 {
   "name": "Template",
-
   "version": "1.0.0",
-
   "description": "Workshop CRMA 2015",
-
   "homepage": "http://www.floz.fr",
-
   "repository": {
     "type": "git",
     "url": ""
   },
-
   "bugs": {
     "url": "/issues"
   },
-
   "keywords": [
     "workshop",
     "gobelins",
     "starter"
   ],
-
   "license": "MIT",
-
   "authors": [
     "florian.zumbrunn <florian.zumbrunn@gmail.com>"
   ],
-
   "engines": {
     "node": "*",
     "npm": "*"
   },
-
   "devDependencies": {
     "browser-sync": "*",
     "browserify": "*",
@@ -54,10 +44,19 @@
     "gulp-util": "*",
     "gulp-watch": "*",
     "gulp-usemin": "*",
+    "glslify": "*",
     "run-sequence": "*",
     "signals": "*",
     "vinyl-buffer": "*",
     "vinyl-source-stream": "*",
     "yargs": "*"
+  },
+  "glslify": {
+    "transform": [
+      "glslify-hex"
+    ]
+  },
+  "dependencies": {
+    "glslify-hex": "^2.0.1"
   }
 }
