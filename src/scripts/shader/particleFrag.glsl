@@ -11,15 +11,15 @@ void main() { // pass the color to the fragment shader
   vec2 uv = vUv;
   vec2 position = (gl_FragCoord.xy / resolution.xy);
 
-
+/*
   if ( position.x < 10.0 && position.y < 20.0 ){
     vec4 texture = texture2D( u_tex, position.xy);
     gl_FragColor = texture;
   }
   else {
     gl_FragColor = vec4(0.0);
-  }
+  }*/
 
 
-//  gl_FragColor = vec4(1.0-position.x, 0.0, 0.0,.4-position.x);
+  gl_FragColor = vec4(1.0, 0.2, 0.2,1.0-position.x);
 }

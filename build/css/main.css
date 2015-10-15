@@ -4,7 +4,8 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#68b7ab+0,a1ead8+42,fff5e2+93 */
+  font-family: "Gill Sans Extrabold", Helvetica, sans-serif;
+  color :#444;
   background: #68b7ab; /* Old browsers */
   background: -moz-linear-gradient(-45deg,  #68b7ab 0%, #a1ead8 42%, #fff5e2 93%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#68b7ab), color-stop(42%,#a1ead8), color-stop(93%,#fff5e2)); /* Chrome,Safari4+ */
@@ -21,7 +22,33 @@ html, body {
   width: 100%;
   height: 100%;
 }
-
+#backStart{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: #68b7ab; /* Old browsers */
+}
+#startExp{
+  position: absolute;
+  top: 25%;
+  left : 35%;
+  z-index: 3;
+  border-radius: 50%;
+  height: 300px;
+  width: 300px;
+  background: rgba(255,255,255,0.5);
+  margin: auto;
+}
+h2{
+  text-align: center;
+  margin-top: 120px;
+  font-size: 3em;
+  vertical-align: middle;
+}
+h2:hover{
+  font-size: 3.2em;
+}
 canvas {
   position: relative;
   display: block;

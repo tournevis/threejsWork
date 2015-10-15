@@ -18,7 +18,6 @@ class Stage extends Emitter {
   init( andDispatch = true ) {
     window.addEventListener( "resize", this._binds.onResize, false )
     window.addEventListener( "orientationchange", this._binds.onResize, false )
-
     if( andDispatch ) {
       this._update()
     }

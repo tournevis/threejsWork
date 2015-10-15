@@ -1,234 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// PERLIN NOISE
-// based 99.999% on Processing's implementation, found here:
-// https://github.com/processing/processing/blob/master/core/src/processing/core/PApplet.java
-// credit goes entirely to them. i just ported it to javascript.
-
-var Alea = require("alea"); // this is pretty great, btw
-
-var Perlin = module.exports = function(seed) {
-	if (seed != undefined) {
-		this.alea_rand = new Alea(seed); // use provided seed
-	} else {
-		this.alea_rand = new Alea(); // use random seed
-	}
-	this.PERLIN_YWRAPB = 4;
-	this.PERLIN_YWRAP = 1 << this.PERLIN_YWRAPB;
-	this.PERLIN_ZWRAPB = 8;
-	this.PERLIN_ZWRAP = 1 << this.PERLIN_ZWRAPB;
-	this.PERLIN_SIZE = 4095;
-	this.perlin_octaves = 4; // default to medium smooth
-	this.perlin_amp_falloff = 0.5; // 50% reduction/octave
-	this.perlin_array = new Array();
-	// generate cos lookup table
-	var DEG_TO_RAD = 0.0174532925;
-	var SINCOS_PRECISION = 0.5;
-	var SINCOS_LENGTH = Math.floor(360/SINCOS_PRECISION);
-	this.cosLUT = new Array();
-	for (var i = 0; i < SINCOS_LENGTH; i++) {
-		this.cosLUT[i] = Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
-	}
-	this.perlin_TWOPI = SINCOS_LENGTH;
-	this.perlin_PI = SINCOS_LENGTH;
-	this.perlin_PI >>= 1;
-}
-
-Perlin.prototype.noiseReseed = function() {
-	this.alea_rand = new Alea(); // new random seed
-	this.perlin_array = new Array(); // start the perlin array fresh
-}
-
-Perlin.prototype.noiseSeed = function(seed) {
-	this.alea_rand = new Alea(seed); // use provided seed
-	this.perlin_array = new Array(); // start the perlin array fresh
-}
-
-
-Perlin.prototype.noiseDetail = function(lod, falloff) {
-	if (Math.floor(lod) > 0) this.perlin_octaves = Math.floor(lod);
-	if (falloff != undefined && falloff > 0) this.perlin_amp_falloff = falloff;
-}
-
-Perlin.prototype.noise_fsc = function(i) {
-	return 0.5 * (1.0 - this.cosLUT[Math.floor(i * this.perlin_PI) % this.perlin_TWOPI]);
-}
-
-Perlin.prototype.noise = function(x, y, z) {
-	if (x == undefined) {
-		return false; // we need at least one param
-	}
-	if (y == undefined) {
-		y = 0; // use 0 if not provided
-	}
-	if (z == undefined) {
-		z = 0; // use 0 if not provided
-	}
-	
-	// build the first perlin array if there isn't one
-	if (this.perlin_array.length == 0) {
-		this.perlin_array = new Array();
-		for (var i = 0; i < this.PERLIN_SIZE + 1; i++) {
-			this.perlin_array[i] = this.alea_rand();
-		}
-	}
-
-	if (x < 0) x = -x;
-	if (y < 0) y = -y;
-	if (z < 0) z = -z;
-	var xi = Math.floor(x);
-	var yi = Math.floor(y);
-	var zi = Math.floor(z);
-	var xf = x - xi;
-	var yf = y - yi;
-	var zf = z - zi;
-	var r = 0;
-	var ampl = 0.5;
-	var rxf, ryf, n1, n2, n3;
-	
-	for (var i = 0; i < this.perlin_octaves; i++) {
-		// look at all this math stuff
-		var of = xi + (yi << this.PERLIN_YWRAPB) + (zi << this.PERLIN_ZWRAPB);
-		rxf = this.noise_fsc(xf);
-		ryf = this.noise_fsc(yf);
-		n1  = this.perlin_array[of & this.PERLIN_SIZE];
-		n1 += rxf * (this.perlin_array[(of + 1) & this.PERLIN_SIZE] - n1);
-		n2  = this.perlin_array[(of + this.PERLIN_YWRAP) & this.PERLIN_SIZE];
-		n2 += rxf * (this.perlin_array[(of + this.PERLIN_YWRAP + 1) & this.PERLIN_SIZE] - n2);
-		n1 += ryf * (n2-n1);
-		of += this.PERLIN_ZWRAP;
-		n2  = this.perlin_array[of & this.PERLIN_SIZE];
-		n2 += rxf * (this.perlin_array[(of + 1) & this.PERLIN_SIZE] - n2);
-		n3  = this.perlin_array[(of + this.PERLIN_YWRAP) & this.PERLIN_SIZE];
-		n3 += rxf * (this.perlin_array[(of + this.PERLIN_YWRAP + 1) & this.PERLIN_SIZE] - n3);
-		n2 += ryf * (n3 - n2);
-		n1 += this.noise_fsc(zf) * (n2 - n1);
-		r += n1 * ampl;
-		ampl *= this.perlin_amp_falloff;
-		xi <<= 1;
-		xf *= 2;
-		yi <<= 1;
-		yf *= 2;
-		zi <<= 1; 
-		zf *= 2;
-		if (xf >= 1) { xi++; xf--; }
-		if (yf >= 1) { yi++; yf--; }
-		if (zf >= 1) { zi++; zf--; }
-	}
-	return r;
-}
-
-},{"alea":2}],2:[function(require,module,exports){
-(function (root, factory) {
-  if (typeof exports === 'object') {
-      module.exports = factory();
-  } else if (typeof define === 'function' && define.amd) {
-      define(factory);
-  } else {
-      root.Alea = factory();
-  }
-}(this, function () {
-
-  'use strict';
-
-  // From http://baagoe.com/en/RandomMusings/javascript/
-
-  // importState to sync generator states
-  Alea.importState = function(i){
-    var random = new Alea();
-    random.importState(i);
-    return random;
-  };
-
-  return Alea;
-
-  function Alea() {
-    return (function(args) {
-      // Johannes Baagøe <baagoe@baagoe.com>, 2010
-      var s0 = 0;
-      var s1 = 0;
-      var s2 = 0;
-      var c = 1;
-
-      if (args.length == 0) {
-        args = [+new Date];
-      }
-      var mash = Mash();
-      s0 = mash(' ');
-      s1 = mash(' ');
-      s2 = mash(' ');
-
-      for (var i = 0; i < args.length; i++) {
-        s0 -= mash(args[i]);
-        if (s0 < 0) {
-          s0 += 1;
-        }
-        s1 -= mash(args[i]);
-        if (s1 < 0) {
-          s1 += 1;
-        }
-        s2 -= mash(args[i]);
-        if (s2 < 0) {
-          s2 += 1;
-        }
-      }
-      mash = null;
-
-      var random = function() {
-        var t = 2091639 * s0 + c * 2.3283064365386963e-10; // 2^-32
-        s0 = s1;
-        s1 = s2;
-        return s2 = t - (c = t | 0);
-      };
-      random.uint32 = function() {
-        return random() * 0x100000000; // 2^32
-      };
-      random.fract53 = function() {
-        return random() + 
-          (random() * 0x200000 | 0) * 1.1102230246251565e-16; // 2^-53
-      };
-      random.version = 'Alea 0.9';
-      random.args = args;
-
-      // my own additions to sync state between two generators
-      random.exportState = function(){
-        return [s0, s1, s2, c];
-      };
-      random.importState = function(i){
-        s0 = +i[0] || 0;
-        s1 = +i[1] || 0;
-        s2 = +i[2] || 0;
-        c = +i[3] || 0;
-      };
- 
-      return random;
-
-    } (Array.prototype.slice.call(arguments)));
-  }
-
-  function Mash() {
-    var n = 0xefc8249d;
-
-    var mash = function(data) {
-      data = data.toString();
-      for (var i = 0; i < data.length; i++) {
-        n += data.charCodeAt(i);
-        var h = 0.02519603282416938 * n;
-        n = h >>> 0;
-        h -= n;
-        h *= n;
-        n = h >>> 0;
-        h -= n;
-        n += h * 0x100000000; // 2^32
-      }
-      return (n >>> 0) * 2.3283064365386963e-10; // 2^-32
-    };
-
-    mash.version = 'Mash 0.9';
-    return mash;
-  }
-}));
-
-},{}],3:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -309,7 +79,7 @@ var Engine = (function () {
 
 module.exports = new Engine();
 
-},{"core/loop":4,"core/stage":6}],4:[function(require,module,exports){
+},{"core/loop":2,"core/stage":4}],2:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -379,7 +149,7 @@ var Loop = (function () {
 
 module.exports = new Loop();
 
-},{}],5:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // Want to customize things ?
 // http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
 
@@ -403,7 +173,7 @@ var Sound = (function (_Emitter) {
 
     this._context = new AudioContext();
 
-    this._bufferSize = 512; // change this value for more or less data
+    this._bufferSize = 1024; // change this value for more or less data
 
     this._analyser = this._context.createAnalyser();
     this._analyser.fftSize = this._bufferSize;
@@ -461,7 +231,7 @@ var Sound = (function (_Emitter) {
 
 module.exports = new Sound();
 
-},{}],6:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -500,7 +270,6 @@ var Stage = (function (_Emitter) {
 
       window.addEventListener("resize", this._binds.onResize, false);
       window.addEventListener("orientationchange", this._binds.onResize, false);
-
       if (andDispatch) {
         this._update();
       }
@@ -531,7 +300,7 @@ var Stage = (function (_Emitter) {
 
 module.exports = new Stage();
 
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 var loop = require("core/loop");
@@ -548,16 +317,40 @@ var xp = new (require("xp/Xp"))();
 engine.scene.add(xp);
 
 //sound.load( "mp3/StGermain_RoseRouge.mp3" )
-sound.load("mp3/ErikSatie_gymnopedie3.mp3");
+var div = document.getElementById("startExp");
+var backDiv = document.getElementById("backStart");
+var play = 0;
+div.addEventListener("click", function (event) {
+    console.log("click");
+    if (play == 0) {
+        sound.load("mp3/ErikSatie_gymnopedie3.mp3");
+        fade(div);
+        fade(backDiv);
+        play++;
+    }
+});
+function fade(element) {
+    var op = 1; // initial opacity
+    var timer = setInterval(function () {
+        if (op <= 0.1) {
+            clearInterval(timer);
+            element.style.display = 'none';
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op -= op * 0.1;
+    }, 50);
+}
+
 sound.on("start", function () {
-  loop.add(function () {
-    xp.update(sound.getData());
-  });
+    loop.add(function () {
+        xp.update(sound.getData());
+    });
 });
 
 loop.start();
 
-},{"core/engine":3,"core/loop":4,"core/sound":5,"core/stage":6,"xp/Xp":8}],8:[function(require,module,exports){
+},{"core/engine":1,"core/loop":2,"core/sound":3,"core/stage":4,"xp/Xp":6}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -569,8 +362,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var engine = require("core/engine");
-var PerlinGenerator = require("proc-noise");
-var Perlin = new PerlinGenerator();
 
 
 var Xp = (function (_THREE$Object3D) {
@@ -587,21 +378,14 @@ var Xp = (function (_THREE$Object3D) {
   _createClass(Xp, [{
     key: "_createDummyPlane",
     value: function _createDummyPlane() {
-      /*
-        */
-
       var geom = new THREE.PlaneBufferGeometry(1000, 1000, 10, 10);
       var mat = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
-      var mesh = new THREE.Mesh(geom, mat);
       var part = new THREE.ImageUtils.loadTexture("img/particles.png");
+
       this.animSin = 0;
-      this.nbPart = 180000;
+      this.nbPart = 1000;
       console.log(" Particules Number : " + this.nbPart);
-      //  this.add( mesh )
-      /*var geometry = new THREE.SphereGeometry( 5, 32, 32 );
-      var material = new THREE.MeshBasicMaterial( {color: 0xff0000 , wireframe: true} );
-      var sphere = new THREE.Mesh( geometry, material );
-      this.add( sphere );*/
+
       /*** LIGHT PART  ***/
 
       this.light = new THREE.PointLight(0xff0000, 1, 1000);
@@ -611,19 +395,38 @@ var Xp = (function (_THREE$Object3D) {
       this.aLight = new THREE.AmbientLight(0x404040);
       this.aLight.position.set(150, 150, 150);
       this.add(this.aLight);
+
       /*** POINT SPLINE ***/
 
+      this.shaderLineMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { type: "f", value: 1.0 },
+          resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+          width: { type: 'f', value: 40 }
+        },
+        attributes: {
+          vertexOpacity: { type: 'f', value: 1 }
+        },
+        size: 8,
+        vertexShader: "#define GLSLIFY 1\nvoid main(){\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
+        fragmentShader: "#define GLSLIFY 1\nvoid main(){\n    gl_FragColor = vec4(1.0,.0,.0,1.0);\n}\n",
+        transparent: true
+      });
+      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x404040, opacity: 1, linewidth: 5 });
+
       this.linePoint = new THREE.Geometry();
+      this.linePoint2 = new THREE.Geometry();
       for (var i = 0 - window.innerWidth / 8; i < window.innerWidth; i += 8) {
         this.linePoint.vertices.push(new THREE.Vector3(i, 10, 20));
+        this.linePoint2.vertices.push(new THREE.Vector3(i, 0, 20));
       }
-      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x404040, opacity: 1, linewidth: 5 });
+
       this.line = new THREE.Line(this.linePoint, lineMaterial);
+      this.line2 = new THREE.Line(this.linePoint2, this.shaderLineMaterial);
       this.add(this.line);
+      this.add(this.line2);
 
       this.lineLength = this.line.geometry.vertices.length;
-
-      //
 
       /*** PARTICLE 1 ***/
 
@@ -631,11 +434,11 @@ var Xp = (function (_THREE$Object3D) {
       this.particles = new THREE.Geometry();
       var pMaterial = new THREE.PointCloudMaterial({
         map: part,
-        color: 0x00ffab,
-        size: 1,
-        blending: THREE.AdditiveBlending,
+        color: 0xcccccc,
+        size: 3,
+        blending: THREE.NoBlending,
         transparent: true,
-        opacity: 1
+        opacity: 0.2
       });
       //img/this.particles.png
       // depthTest: false
@@ -644,7 +447,7 @@ var Xp = (function (_THREE$Object3D) {
         // create a particle with random
         // position values, -250 -> 250
 
-        var pX = p % (this.lineLength - 1) - window.innerWidth / 8,
+        var pX = (p % (this.lineLength - 1) - window.innerWidth / 12) * 1.5,
             pY = Math.random() * 5,
             //Math.random() * 500 - 250,
         pZ = Math.random() * 5 + 17,
@@ -659,14 +462,15 @@ var Xp = (function (_THREE$Object3D) {
 
       /*** PARTICLE 2 ***/
 
-      /*THREE.NoBlending
+      /*REMINDERS
+      THREE.NoBlending
       THREE.NormalBlending
       THREE.AdditiveBlending
       THREE.SubtractiveBlending
       THREE.MultiplyBlending
       THREE.CustomBlending */
 
-      var particleCount2 = this.nbPart / 2;
+      var particleCount2 = 500;
       this.particles2 = new THREE.Geometry();
       var pMaterial2 = new THREE.PointCloudMaterial({
         map: part,
@@ -689,21 +493,21 @@ var Xp = (function (_THREE$Object3D) {
         attributes: {
           vertexOpacity: { type: 'f', value: 1 }
         },
-        vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = size;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
-        fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nuniform sampler2D u_tex;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n\n  if ( position.x < 10.0 && position.y < 20.0 ){\n    vec4 texture = texture2D( u_tex, position.xy);\n    gl_FragColor = texture;\n  }\n  else {\n    gl_FragColor = vec4(0.0);\n  }\n\n\n//  gl_FragColor = vec4(1.0-position.x, 0.0, 0.0,.4-position.x);\n}\n",
+        vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = .9- position.x/2.0;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
+        fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nuniform sampler2D u_tex;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n/*\n  if ( position.x < 10.0 && position.y < 20.0 ){\n    vec4 texture = texture2D( u_tex, position.xy);\n    gl_FragColor = texture;\n  }\n  else {\n    gl_FragColor = vec4(0.0);\n  }*/\n\n\n  gl_FragColor = vec4(1.0, 0.2, 0.2,1.0-position.x);\n}\n",
         transparent: true
 
       });
-      //img/this.particles.png
+
       for (var p = 0; p < particleCount2; p++) {
 
         // create a particle with random
         // position values, -250 -> 250
 
-        var pX = p % (this.lineLength - 1) - window.innerWidth / 8,
+        var pX = (p % (this.lineLength - 1) - window.innerWidth / 12) * 1.5,
             pY = Math.random() * 5,
             //Math.random() * 500 - 250,
-        pZ = Math.random() * 5 + 17,
+        pZ = Math.random() * 5,
             particle2 = new THREE.Vector3(pX, pY, pZ);
 
         // add it to the geometry
@@ -713,31 +517,29 @@ var Xp = (function (_THREE$Object3D) {
 
       // create the particle system
       this.particleSystem2 = new THREE.PointCloud(this.particles2, this.shaderMaterial);
-
       this.add(this.particleSystem);
       this.add(this.particleSystem2);
 
-      /*** GEOMETRY PART ***/
+      /*** GEOMETRY CUBE PART ***/
+
       var wireframe_material = new THREE.MeshBasicMaterial({ color: 0x2B4141, wireframe: true, wireframe_linewidth: 10 });
       this.speed = 0.01;
       this.sizeCube = 0;
-      var geometry = new THREE.BoxGeometry(100, 100, 100, 20, 20, 20);
-      var material = new THREE.MeshLambertMaterial({ color: 0xF0544F });
+      var geometry = new THREE.BoxGeometry(20, 20, 20);
+      var material = new THREE.MeshBasicMaterial({ color: 0xF0544F });
       this.object = new THREE.Mesh(geometry, material);
-      //  this.object2 = new THREE.Mesh(geometry2 ,material);
-      //	this.add( this.object );
-
-      this.object2 = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x2B4141 }));
-      this.object2.position.x -= 50;
-      this.object2.position.z -= 20;
-      this.object2.position.y -= 50;
-
-      //this.add(this.object2)
+      this.object.position.x -= window.innerWidth / 8 + 5;
+      this.object.position.z = 20;
+      this.add(this.object);
 
       /** Cube function from three exemple  **/
-      var geometryCube = _cube(110);
-      this.iceCube = new THREE.LineSegments(geometryCube, new THREE.LineBasicMaterial({ color: 0x5D737E, linewidth: 10, linecap: 'butt' }));
-      //	this.add(this.iceCube );
+      var geometryCube = _cube(22);
+
+      this.iceCube = new THREE.LineSegments(geometryCube, new THREE.LineBasicMaterial({ color: 0x5D737E, linewidth: 2, linecap: 'butt' }));
+      this.iceCube.position.x = this.object.position.x;
+      this.iceCube.position.y = this.object.position.y;
+      this.iceCube.position.z = this.object.position.z;
+      this.add(this.iceCube);
       function _cube(size) {
         console.log("CUBED");
         var h = size * 0.5;
@@ -758,39 +560,30 @@ var Xp = (function (_THREE$Object3D) {
         return;
       }
       this.linePoint.verticesNeedUpdate = true;
+      this.linePoint2.verticesNeedUpdate = true;
       this.particles.verticesNeedUpdate = true;
       this.particles2.verticesNeedUpdate = true;
 
-      //  this.sizeCube += 0.01
+      //this.sizeCube += 0.01
       this.object.rotation.z -= 2 * this.speed;
       this.object.rotation.x -= 3 * this.speed;
-      this.object2.rotation.z -= 2 * this.speed;
-      this.object2.rotation.x -= 3 * this.speed;
-
       this.iceCube.rotation.z -= 2 * this.speed;
       this.iceCube.rotation.x -= 3 * this.speed;
-      //  this.particleSystem.rotation.y += 0.01;
-      // Want to customize things ?
-      // http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
-      //  this.iceCube.scale.x = ( data.freq[0] /100);
+      //this.particleSystem.rotation.y += 0.01;
+      //Want to customize things ?
+      //http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
+      //this.iceCube.scale.x = ( data.freq[0] /100);
 
-      //console.log(this.line);
-
-      // une fois la case 0 recopiee sur la case 1,
-      // transferer la valeur nouvelle du capteur dans la case 0 du registre
       //  registre1[0] = capteur[0];
       /**** VOLUME  ****/
       function getAverageVolume(array) {
         var values = 0;
         var average;
-
         var length = array.length;
-
         // get all the frequency amplitudes
         for (var i = 0; i < length; i++) {
           values += array[i];
         }
-
         average = values / length;
         return average;
       }
@@ -799,14 +592,15 @@ var Xp = (function (_THREE$Object3D) {
 
       var volume = getAverageVolume(data.freq);
       var average = 0;
-      var freqSize = 10;
+      var freqSize = 5;
       for (var i = 0; i < freqSize; i++) {
         average += data.freq[i];
       }
       this.animSin += 0.1;
       for (var i = this.lineLength - 1; i > 0; i--) {
         this.line.geometry.vertices[i].y = this.line.geometry.vertices[i - 1].y;
-
+        this.line2.geometry.vertices[i].y = this.line2.geometry.vertices[i - 1].y;
+        this.line2.geometry.vertices[i].z = this.line2.geometry.vertices[i - 1].z;
         // this.line.geometry.vertices[i].y += Math.sin( this.animSin) * (average /freqSize )
       }
 
@@ -818,13 +612,17 @@ var Xp = (function (_THREE$Object3D) {
       }
       //this.particles.vertices[i].y = this.line.geometry.vertices[i].y
       this.line.geometry.vertices[0].y = volume * 2;
+      this.iceCube.position.y = this.line.geometry.vertices[0].y;
+      this.object.position.y = this.line.geometry.vertices[0].y;
+
+      this.line2.geometry.vertices[0].y = Math.sin(this.animSin) / 2 * (average / freqSize) * 0.2 + 10;
+      this.line2.geometry.vertices[0].z = Math.sin(this.animSin) / 2 * (average / freqSize) * 0.4;
       //this.line.geometry.vertices[0].y =  Perlin.noise(817)
       //console.log(this.line.geometry.vertices[0].y)
       //console.log();
       if (data.freq[0] > 250) {
         engine.n = 1;
       } else if (data.freq[0] < 210) {
-
         engine.n = 1;
       }
       //this.iceCube.scale.y += Math.cos(this.sizeCube * Math.PI) * 0.01
@@ -849,4 +647,4 @@ var Xp = (function (_THREE$Object3D) {
 
 module.exports = Xp;
 
-},{"core/engine":3,"proc-noise":1}]},{},[7]);
+},{"core/engine":1}]},{},[5]);

@@ -1,6 +1,4 @@
 const engine = require( "core/engine" )
-var PerlinGenerator = require("proc-noise");
-var Perlin = new PerlinGenerator();
 const glslify = require('glslify');
 class Xp extends THREE.Object3D {
 
@@ -11,24 +9,14 @@ class Xp extends THREE.Object3D {
   }
 
   _createDummyPlane() {
-    /*
-
-
-    */
-
-
     const geom = new THREE.PlaneBufferGeometry( 1000, 1000, 10, 10 )
     const mat = new THREE.MeshBasicMaterial( { color: 0xff00ff, wireframe: true } )
-    const mesh = new THREE.Mesh( geom, mat )
     const part = new THREE.ImageUtils.loadTexture( "img/particles.png" );
+
     this.animSin = 0;
-    this.nbPart = 180000;
+    this.nbPart = 1000;
     console.log(" Particules Number : " + this.nbPart )
-  //  this.add( mesh )
-    /*var geometry = new THREE.SphereGeometry( 5, 32, 32 );
-    var material = new THREE.MeshBasicMaterial( {color: 0xff0000 , wireframe: true} );
-    var sphere = new THREE.Mesh( geometry, material );
-    this.add( sphere );*/
+
     /*** LIGHT PART  ***/
 
     this.light = new THREE.PointLight( 0xff0000, 1, 1000 );
@@ -38,21 +26,40 @@ class Xp extends THREE.Object3D {
     this.aLight = new THREE.AmbientLight( 0x404040 );
     this.aLight.position.set( 150, 150, 150 );
     this.add( this.aLight );
+
+
     /*** POINT SPLINE ***/
 
+    this.shaderLineMaterial  = new THREE.ShaderMaterial( {
+      uniforms: {
+        time: { type: "f", value: 1.0 },
+        resolution: { type: "v2", value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        width : { type: 'f', value: 40 }
+      },
+      attributes: {
+        vertexOpacity: { type: 'f', value: 1 },
+      },
+      size:8,
+      vertexShader: glslify('../shader/lineVert.glsl'),
+      fragmentShader: glslify('../shader/lineFrag.glsl'),
+      transparent: true
+    });
+    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x404040, opacity: 1, linewidth: 5} );
 
 
     this.linePoint = new THREE.Geometry() ;
+    this.linePoint2 = new THREE.Geometry() ;
     for(var i = 0 -window.innerWidth/8  ; i < window.innerWidth; i+=8){
       this.linePoint.vertices.push(new THREE.Vector3( i , 10, 20));
+      this.linePoint2.vertices.push(new THREE.Vector3( i , 0, 20));
     }
-    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x404040, opacity: 1, linewidth: 5} );
+
     this.line = new THREE.Line( this.linePoint, lineMaterial );
+    this.line2 = new THREE.Line( this.linePoint2, this.shaderLineMaterial );
     this.add(this.line)
+    this.add(this.line2)
 
     this.lineLength = this.line.geometry.vertices.length;
-
-    //
 
     /*** PARTICLE 1 ***/
 
@@ -60,11 +67,11 @@ class Xp extends THREE.Object3D {
     this.particles = new THREE.Geometry()
       var pMaterial = new THREE.PointCloudMaterial({
       map: part,
-      color: 0x00ffab,
-      size:1 ,
-      blending: THREE.AdditiveBlending,
+      color: 0xcccccc,
+      size:3,
+      blending: THREE.NoBlending,
       transparent : true,
-      opacity : 1,
+      opacity : 0.2,
       // depthTest: false
     });
     //img/this.particles.png
@@ -73,7 +80,7 @@ class Xp extends THREE.Object3D {
     // create a particle with random
     // position values, -250 -> 250
 
-      var pX =p %(this.lineLength-1 ) - window.innerWidth/8,
+      var pX =(p %(this.lineLength-1 ) - window.innerWidth/12 )* 1.5,
           pY =  Math.random() * 5,//Math.random() * 500 - 250,
           pZ = Math.random() * 5 +17,
           particle = new THREE.Vector3(pX, pY, pZ);
@@ -86,19 +93,22 @@ class Xp extends THREE.Object3D {
   // create the particle system
     this.particleSystem = new THREE.PointCloud(
       this.particles,
-      pMaterial);
+      pMaterial
+    );
 
 
     /*** PARTICLE 2 ***/
 
-    /*THREE.NoBlending
-THREE.NormalBlending
-THREE.AdditiveBlending
-THREE.SubtractiveBlending
-THREE.MultiplyBlending
-THREE.CustomBlending */
+          /*REMINDERS
 
-      var particleCount2 = this.nbPart /2
+      THREE.NoBlending
+      THREE.NormalBlending
+      THREE.AdditiveBlending
+      THREE.SubtractiveBlending
+      THREE.MultiplyBlending
+      THREE.CustomBlending */
+
+      var particleCount2 = 500
       this.particles2 = new THREE.Geometry()
         var pMaterial2 = new THREE.PointCloudMaterial({
         map: part,
@@ -126,15 +136,15 @@ THREE.CustomBlending */
       transparent: true
 
     } );
-      //img/this.particles.png
+
       for (var p = 0; p < particleCount2; p++) {
 
       // create a particle with random
       // position values, -250 -> 250
 
-        var pX =p %(this.lineLength-1 ) - window.innerWidth/8,
+        var pX =(p %(this.lineLength-1 ) - window.innerWidth/12)*1.5,
             pY =  Math.random() * 5,//Math.random() * 500 - 250,
-            pZ = Math.random() * 5 +17,
+            pZ = Math.random() * 5 ,
             particle2 = new THREE.Vector3(pX, pY, pZ);
 
       // add it to the geometry
@@ -144,35 +154,32 @@ THREE.CustomBlending */
 
     // create the particle system
       this.particleSystem2 = new THREE.PointCloud(
-        this.particles2,
-        this.shaderMaterial);
+      this.particles2,
+      this.shaderMaterial);
+      this.add(this.particleSystem);
+      this.add(this.particleSystem2);
 
-        this.add(this.particleSystem);
-        this.add(this.particleSystem2);
+    /*** GEOMETRY CUBE PART ***/
 
-    /*** GEOMETRY PART ***/
     var wireframe_material = new THREE.MeshBasicMaterial( { color: 0x2B4141, wireframe: true, wireframe_linewidth: 10 } );
     this.speed = 0.01;
     this.sizeCube = 0;
-    var geometry = new THREE.BoxGeometry( 100, 100, 100, 20, 20, 20 );
-		var  material = new THREE.MeshLambertMaterial( { color: 0xF0544F } );
-  		this.object = new THREE.Mesh( geometry, material );
-  //  this.object2 = new THREE.Mesh(geometry2 ,material);
-	//	this.add( this.object );
-
-    this.object2 = new THREE.Mesh( geometry,new THREE.MeshBasicMaterial( { color: 0x2B4141} ) );
-    this.object2.position.x -=50;
-    this.object2.position.z -=20;
-    this.object2.position.y -=50;
-
-
-    //this.add(this.object2)
+    var geometry = new THREE.BoxGeometry( 20, 20, 20 );
+		var  material = new THREE.MeshBasicMaterial( { color: 0xF0544F } );
+  	this.object = new THREE.Mesh( geometry, material );
+    this.object.position.x -= window.innerWidth/8 +5;
+    this.object.position.z = 20;
+		this.add( this.object );
 
 
     /** Cube function from three exemple  **/
-    var geometryCube = _cube( 110 );
-    this.iceCube= new THREE.LineSegments( geometryCube, new THREE.LineBasicMaterial( { color: 0x5D737E , linewidth : 10, linecap: 'butt' } ) );
-	//	this.add(this.iceCube );
+    var geometryCube = _cube( 22 );
+
+    this.iceCube= new THREE.LineSegments( geometryCube, new THREE.LineBasicMaterial( { color: 0x5D737E , linewidth : 2, linecap: 'butt' } ) );
+    this.iceCube.position.x = this.object.position.x;
+    this.iceCube.position.y = this.object.position.y;
+    this.iceCube.position.z = this.object.position.z;
+    this.add(this.iceCube );
     function _cube( size ) {
           console.log("CUBED")
   				var h = size * 0.5;
@@ -230,40 +237,30 @@ THREE.CustomBlending */
       return
     }
     this.linePoint.verticesNeedUpdate = true;
+    this.linePoint2.verticesNeedUpdate = true;
     this.particles.verticesNeedUpdate = true;
     this.particles2.verticesNeedUpdate = true;
 
-    //  this.sizeCube += 0.01
+    //this.sizeCube += 0.01
     this.object.rotation.z -= 2 * this.speed;
     this.object.rotation.x -= 3 * this.speed;
-    this.object2.rotation.z -= 2 * this.speed;
-    this.object2.rotation.x -= 3 * this.speed;
-
     this.iceCube.rotation.z -= 2 * this.speed;
     this.iceCube.rotation.x -= 3 * this.speed;
-  //  this.particleSystem.rotation.y += 0.01;
-    // Want to customize things ?
-    // http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
-  //  this.iceCube.scale.x = ( data.freq[0] /100);
+    //this.particleSystem.rotation.y += 0.01;
+    //Want to customize things ?
+    //http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
+    //this.iceCube.scale.x = ( data.freq[0] /100);
 
-
-    //console.log(this.line);
-
-      // une fois la case 0 recopiee sur la case 1,
-      // transferer la valeur nouvelle du capteur dans la case 0 du registre
     //  registre1[0] = capteur[0];
     /**** VOLUME  ****/
     function getAverageVolume(array) {
         var values = 0;
         var average;
-
         var length = array.length;
-
         // get all the frequency amplitudes
         for (var i = 0; i < length; i++) {
             values += array[i];
         }
-
         average = values / length;
         return average;
     }
@@ -272,14 +269,15 @@ THREE.CustomBlending */
 
     var volume = getAverageVolume(data.freq)
     var average = 0;
-    var freqSize = 10;
+    var freqSize = 5;
     for (var i = 0; i < freqSize; i++) {
       average += data.freq[i] ;
     }
     this.animSin += 0.1
     for(var i = this.lineLength-1 ; i > 0; i--){
      this.line.geometry.vertices[i].y = this.line.geometry.vertices[i-1].y
-
+     this.line2.geometry.vertices[i].y = this.line2.geometry.vertices[i-1].y
+     this.line2.geometry.vertices[i].z = this.line2.geometry.vertices[i-1].z
     // this.line.geometry.vertices[i].y += Math.sin( this.animSin) * (average /freqSize )
     }
 
@@ -291,13 +289,17 @@ THREE.CustomBlending */
     }
     //this.particles.vertices[i].y = this.line.geometry.vertices[i].y
     this.line.geometry.vertices[0].y = volume *2
+    this.iceCube.position.y = this.line.geometry.vertices[0].y;
+    this.object.position.y = this.line.geometry.vertices[0].y;
+
+    this.line2.geometry.vertices[0].y = Math.sin( this.animSin)/2 * (average /freqSize )*0.2 +10
+    this.line2.geometry.vertices[0].z = Math.sin( this.animSin)/2 * (average /freqSize )*0.4
     //this.line.geometry.vertices[0].y =  Perlin.noise(817)
     //console.log(this.line.geometry.vertices[0].y)
     //console.log();
     if(data.freq[0] >250){
       engine.n=1
     }else if(data.freq[0] < 210){
-
       engine.n=1
     }
     //this.iceCube.scale.y += Math.cos(this.sizeCube * Math.PI) * 0.01

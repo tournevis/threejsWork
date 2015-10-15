@@ -8,7 +8,7 @@ class Sound extends Emitter {
 
     this._context = new AudioContext()
 
-    this._bufferSize = 512 // change this value for more or less data
+    this._bufferSize = 1024 // change this value for more or less data
 
     this._analyser = this._context.createAnalyser()
     this._analyser.fftSize = this._bufferSize

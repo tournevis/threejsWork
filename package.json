@@ -57,6 +57,7 @@
     ]
   },
   "dependencies": {
+    "glslify": "^2.3.1",
     "glslify-hex": "^2.0.1"
   }
 }

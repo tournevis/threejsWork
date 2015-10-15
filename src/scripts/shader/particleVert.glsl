@@ -8,7 +8,7 @@ varying float xPos;
 varying vec2 vUv;
 void main(){
   vUv = uv;
-  gl_PointSize = size;
+  gl_PointSize = .9- position.x/2.0;
   particle = vec2(position.xy);
   vColor = vec3(position);
   xPos = position.x;
