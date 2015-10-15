@@ -12,11 +12,13 @@ var Engine = (function () {
   function Engine() {
     _classCallCheck(this, Engine);
 
+    this.n = 1;
     this.scene = new THREE.Scene();
 
-    /*this.camera = new THREE.PerspectiveCamera( 75, 0, 1, 10000 )
-    this.camera.position.z = 10*/
-    this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -500, 10000);
+    this.camera = new THREE.PerspectiveCamera(75, 0, 1, 10000);
+    this.cameraAnim = 0.01;
+    //this.camera.position.z = 10
+    this.camera2 = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -500, 10000);
     this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     //  this.renderer.autoClear = false;
@@ -37,7 +39,18 @@ var Engine = (function () {
   _createClass(Engine, [{
     key: "_onUpdate",
     value: function _onUpdate() {
-      this.renderer.render(this.scene, this.camera);
+      this.cameraAnim += 0.02;
+      this.camera.position.z += Math.sin(this.cameraAnim);
+
+      switch (this.n) {
+        case 1:
+          this.renderer.render(this.scene, this.camera);
+          break;
+        case 2:
+          this.renderer.render(this.scene, this.camera2);
+          break;
+      }
+
       //this.renderer.clear();
       //this.composer.render();
     }
@@ -194,7 +207,7 @@ var Sound = (function (_Emitter) {
         _this._source.connect(_this._analyser);
         _this._source.buffer = buffer;
         _this._source.connect(_this._context.destination);
-        //this._source.start( 0 )
+        // this._source.start( 0 )
 
         _this.emit("start");
       }, function () {
@@ -304,7 +317,7 @@ document.getElementById("main").appendChild(engine.dom);
 var xp = new (require("xp/Xp"))();
 engine.scene.add(xp);
 
-sound.load("mp3/glencheck_vivid.mp3");
+sound.load("mp3/StGermain_RoseRouge.mp3");
 sound.on("start", function () {
   loop.add(function () {
     xp.update(sound.getData());
@@ -323,6 +336,8 @@ var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_ag
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var engine = require("core/engine");
 
 var Xp = (function (_THREE$Object3D) {
   _inherits(Xp, _THREE$Object3D);
@@ -349,12 +364,13 @@ var Xp = (function (_THREE$Object3D) {
       this.add( sphere );*/
       /*** LIGHT PART  ***/
 
-      /*this.light = new THREE.PointLight( 0xff0000, 1, 1000 );
-      this.light.position.set( 150, 150, 150 );
-      this.add( this.light );
-       this.aLight = new THREE.AmbientLight( 0x404040 );
-      this.aLight.position.set( 150, 150, 150 );
-      this.add( this.aLight );*/
+      this.light = new THREE.PointLight(0xff0000, 1, 1000);
+      this.light.position.set(150, 150, 150);
+      this.add(this.light);
+
+      this.aLight = new THREE.AmbientLight(0x404040);
+      this.aLight.position.set(150, 150, 150);
+      this.add(this.aLight);
 
       /*** GEOMETRY PART ***/
       var wireframe_material = new THREE.MeshBasicMaterial({ color: 0x2B4141, wireframe: true, wireframe_linewidth: 10 });
@@ -367,6 +383,12 @@ var Xp = (function (_THREE$Object3D) {
       //  this.object2 = new THREE.Mesh(geometry2 ,material);
       this.add(this.object);
 
+      this.object2 = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x2B4141 }));
+      this.object2.position.x -= 50;
+      this.object2.position.z -= 20;
+      this.object2.position.y -= 50;
+
+      this.add(this.object2);
       /** Cube function from three exemple  **/
       var geometryCube = _cube(110);
       this.iceCube = new THREE.LineSegments(geometryCube, new THREE.LineBasicMaterial({ color: 0x5D737E, linewidth: 10, linecap: 'butt' }));
@@ -390,18 +412,28 @@ var Xp = (function (_THREE$Object3D) {
       if (!data) {
         return;
       }
-      this.sizeCube += 0.01;
+      //  this.sizeCube += 0.01
       this.object.rotation.z -= 2 * this.speed;
       this.object.rotation.x -= 3 * this.speed;
+      this.object2.rotation.z -= 2 * this.speed;
+      this.object2.rotation.x -= 3 * this.speed;
 
       this.iceCube.rotation.z -= 2 * this.speed;
       this.iceCube.rotation.x -= 3 * this.speed;
+
       // Want to customize things ?
       // http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
-      /*this.iceCube.scale.x += Math.cos(this.sizeCube * Math.PI) * 0.01
-      this.iceCube.scale.y += Math.cos(this.sizeCube * Math.PI) * 0.01
-      this.iceCube.scale.z += Math.cos(this.sizeCube * Math.PI) * 0.01 */
-      // console.log( data.freq, data.time )
+      //  this.iceCube.scale.x = ( data.freq[0] /100);
+      if (data.freq[0] > 250) {
+        engine.n = 2;
+      } else if (data.freq[0] < 210) {
+
+        engine.n = 1;
+      }
+      //this.iceCube.scale.y += Math.cos(this.sizeCube * Math.PI) * 0.01
+      //this.iceCube.scale.z += Math.cos(this.sizeCube * Math.PI) * 0.01
+      //console.log( data.freq, data.time )
+      console.log(data.freq[2]);
 
       var n = data.freq.length; // for bar // from 0 - 256, no sound = 0
       for (var i = 0; i < n; i++) {
@@ -420,4 +452,4 @@ var Xp = (function (_THREE$Object3D) {
 
 module.exports = Xp;
 
-},{}]},{},[5]);
+},{"core/engine":1}]},{},[5]);

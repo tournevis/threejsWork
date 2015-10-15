@@ -4,11 +4,13 @@ const stage = require( "core/stage" )
 class Engine {
 
   constructor() {
+    this.n = 1;
     this.scene = new THREE.Scene()
 
-    /*this.camera = new THREE.PerspectiveCamera( 75, 0, 1, 10000 )
-    this.camera.position.z = 10*/
-    this.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 10000 );
+    this.camera = new THREE.PerspectiveCamera( 75, 0, 1, 10000 )
+    this.cameraAnim = 0.01;
+    //this.camera.position.z = 10
+    this.camera2 = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 10000 );
     this.renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } )
     this.renderer.setPixelRatio( window.devicePixelRatio )
   //  this.renderer.autoClear = false;
@@ -28,7 +30,18 @@ class Engine {
   }
 
   _onUpdate() {
+    this.cameraAnim += 0.02;
+    this.camera.position.z += Math.sin(this.cameraAnim )
+
+    switch(this.n){
+      case 1 :
     this.renderer.render( this.scene, this.camera )
+      break;
+      case 2 :
+    this.renderer.render(this.scene, this.camera2)
+      break;
+    }
+
     //this.renderer.clear();
     //this.composer.render();
   }
