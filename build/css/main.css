@@ -6,14 +6,7 @@ html, body {
   padding: 0;
   font-family: "Gill Sans Extrabold", Helvetica, sans-serif;
   color :#444;
-  background: #68b7ab; /* Old browsers */
-  background: -moz-linear-gradient(-45deg,  #68b7ab 0%, #a1ead8 42%, #fff5e2 93%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#68b7ab), color-stop(42%,#a1ead8), color-stop(93%,#fff5e2)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(-45deg,  #68b7ab 0%,#a1ead8 42%,#fff5e2 93%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(-45deg,  #68b7ab 0%,#a1ead8 42%,#fff5e2 93%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(-45deg,  #68b7ab 0%,#a1ead8 42%,#fff5e2 93%); /* IE10+ */
-  background: linear-gradient(135deg,  #68b7ab 0%,#a1ead8 42%,#fff5e2 93%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#68b7ab', endColorstr='#fff5e2',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  background: #1F3D3C; /* Old browsers */
 
 }
 

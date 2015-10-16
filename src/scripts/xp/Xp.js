@@ -44,7 +44,7 @@ class Xp extends THREE.Object3D {
       fragmentShader: glslify('../shader/lineFrag.glsl'),
       transparent: true
     });
-    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x404040, opacity: 1, linewidth: 5} );
+    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x32C0A5, opacity: 1, linewidth: 5} );
 
 
     this.linePoint = new THREE.Geometry() ;
@@ -67,30 +67,21 @@ class Xp extends THREE.Object3D {
     this.particles = new THREE.Geometry()
       var pMaterial = new THREE.PointCloudMaterial({
       map: part,
-      color: 0xcccccc,
+      //color: 0xcccccc,
       size:3,
-      blending: THREE.NoBlending,
+      blending: THREE.AdditiveBlending,
       transparent : true,
-      opacity : 0.2,
+      opacity : 1.0,
       // depthTest: false
     });
-    //img/this.particles.png
     for (var p = 0; p < particleCount; p++) {
 
-    // create a particle with random
-    // position values, -250 -> 250
-
-      var pX =(p %(this.lineLength-1 ) - window.innerWidth/12 )* 1.5,
+      var pX =(p %(this.lineLength-1 ) - window.innerWidth/8 )* 1.1,
           pY =  Math.random() * 5,//Math.random() * 500 - 250,
           pZ = Math.random() * 5 +17,
           particle = new THREE.Vector3(pX, pY, pZ);
-
-
-    // add it to the geometry
       this.particles.vertices.push(particle);
     }
-
-  // create the particle system
     this.particleSystem = new THREE.PointCloud(
       this.particles,
       pMaterial
@@ -138,16 +129,10 @@ class Xp extends THREE.Object3D {
     } );
 
       for (var p = 0; p < particleCount2; p++) {
-
-      // create a particle with random
-      // position values, -250 -> 250
-
         var pX =(p %(this.lineLength-1 ) - window.innerWidth/12)*1.5,
             pY =  Math.random() * 5,//Math.random() * 500 - 250,
             pZ = Math.random() * 5 ,
             particle2 = new THREE.Vector3(pX, pY, pZ);
-
-      // add it to the geometry
 
         this.particles2.vertices.push(particle2);
       }
@@ -161,11 +146,10 @@ class Xp extends THREE.Object3D {
 
     /*** GEOMETRY CUBE PART ***/
 
-    var wireframe_material = new THREE.MeshBasicMaterial( { color: 0x2B4141, wireframe: true, wireframe_linewidth: 10 } );
     this.speed = 0.01;
     this.sizeCube = 0;
     var geometry = new THREE.BoxGeometry( 20, 20, 20 );
-		var  material = new THREE.MeshBasicMaterial( { color: 0xF0544F } );
+		var  material = new THREE.MeshBasicMaterial( { color: 0xACFCD9 } );
   	this.object = new THREE.Mesh( geometry, material );
     this.object.position.x -= window.innerWidth/8 +5;
     this.object.position.z = 20;
@@ -173,6 +157,7 @@ class Xp extends THREE.Object3D {
 
 
     /** Cube function from three exemple  **/
+
     var geometryCube = _cube( 22 );
 
     this.iceCube= new THREE.LineSegments( geometryCube, new THREE.LineBasicMaterial( { color: 0x5D737E , linewidth : 2, linecap: 'butt' } ) );
@@ -228,8 +213,6 @@ class Xp extends THREE.Object3D {
   				return geometry2;
 
   			}
-    //this.add(this.object2)
-		//this.add( edges );
   }
 
   update( data ) {
@@ -246,12 +229,6 @@ class Xp extends THREE.Object3D {
     this.object.rotation.x -= 3 * this.speed;
     this.iceCube.rotation.z -= 2 * this.speed;
     this.iceCube.rotation.x -= 3 * this.speed;
-    //this.particleSystem.rotation.y += 0.01;
-    //Want to customize things ?
-    //http://www.airtightinteractive.com/demos/js/uberviz/audioanalysis/
-    //this.iceCube.scale.x = ( data.freq[0] /100);
-
-    //  registre1[0] = capteur[0];
     /**** VOLUME  ****/
     function getAverageVolume(array) {
         var values = 0;
@@ -265,7 +242,7 @@ class Xp extends THREE.Object3D {
         return average;
     }
 
-    /*********/
+    /**** SOUND *****/
 
     var volume = getAverageVolume(data.freq)
     var average = 0;
@@ -297,27 +274,16 @@ class Xp extends THREE.Object3D {
     //this.line.geometry.vertices[0].y =  Perlin.noise(817)
     //console.log(this.line.geometry.vertices[0].y)
     //console.log();
+    
+    /** MULTI CAMERA SETUP  **/
+    engine.n =1;
+
+    /*
     if(data.freq[0] >250){
       engine.n=1
     }else if(data.freq[0] < 210){
-      engine.n=1
-    }
-    //this.iceCube.scale.y += Math.cos(this.sizeCube * Math.PI) * 0.01
-    //this.iceCube.scale.z += Math.cos(this.sizeCube * Math.PI) * 0.01
-    //console.log( data.freq, data.time )
-    //console.log(data.freq[2])
-
-
-
-    let n = data.freq.length // for bar // from 0 - 256, no sound = 0
-    for( var i = 0; i < n; i++ ) {
-      // do your stuff here
-    }
-
-    n = data.time.length // for wave // from 0 - 256, no sound = 128
-    for( i = 0; i < n; i++ ) {
-      // do your stuff here
-    }
+      engine.n=2
+    }*/
   }
 
 

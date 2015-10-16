@@ -13,10 +13,8 @@ class Engine {
     this.camera2 = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 10000 );
     this.renderer = new THREE.WebGLRenderer( { antialias: false, alpha: true } )
     this.renderer.setPixelRatio( window.devicePixelRatio )
-  //  this.renderer.autoClear = false;
+  //this.renderer.autoClear = false;
 		this.camera.position.z = 200;
-
-
     this.dom = this.renderer.domElement
 
     /** CUSTOM RENDER PASS **/
@@ -30,9 +28,11 @@ class Engine {
   }
 
   _onUpdate() {
+    /*** CAMERA SIMPLE ANIMATION ON Z ***/
     this.cameraAnim += 0.02;
     this.camera.position.z += Math.sin(this.cameraAnim )
 
+    /** MULTI CAMERA CONTROL **/
     switch(this.n){
       case 1 :
     this.renderer.render( this.scene, this.camera )
