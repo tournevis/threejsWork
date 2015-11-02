@@ -260,9 +260,13 @@ class Xp extends THREE.Object3D {
 
     for (var i = 0; i < this.particles.vertices.length; i++) {
       this.particles.vertices[i].y = this.line.geometry.vertices[i %(this.lineLength-1 )].y
+
+
     }
     for (var i = 0; i < this.particles2.vertices.length; i++) {
       this.particles2.vertices[i].y = this.line.geometry.vertices[i %(this.lineLength-1 )].y
+      this.particles2.vertices[i].rotation    = 45;
+
     }
     //this.particles.vertices[i].y = this.line.geometry.vertices[i].y
     this.line.geometry.vertices[0].y = volume *2

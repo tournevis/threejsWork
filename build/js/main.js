@@ -485,7 +485,7 @@ var Xp = (function (_THREE$Object3D) {
         attributes: {
           vertexOpacity: { type: 'f', value: 1 }
         },
-        vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = .9 - position.x/3.0;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
+        vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = 30.0;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
         fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nuniform sampler2D u_tex;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n  /*  //Ca tricote , ca tricote\n  if ( position.x < 10.0 && position.y < 20.0 ){\n    vec4 texture = texture2D( u_tex, position.xy);\n    gl_FragColor = texture;\n  }\n  else {\n    gl_FragColor = vec4(0.0);\n  }*/\n\n  gl_FragColor = vec4(.85, .9, 0.85,1.0-position.x/2.0);\n}\n",
         transparent: true
 
@@ -587,6 +587,7 @@ var Xp = (function (_THREE$Object3D) {
       }
       for (var i = 0; i < this.particles2.vertices.length; i++) {
         this.particles2.vertices[i].y = this.line.geometry.vertices[i % (this.lineLength - 1)].y;
+        this.particles2.vertices[i].rotation = 45;
       }
       //this.particles.vertices[i].y = this.line.geometry.vertices[i].y
       this.line.geometry.vertices[0].y = volume * 2;
