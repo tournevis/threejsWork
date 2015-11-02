@@ -179,7 +179,7 @@ var Sound = (function (_Emitter) {
     this._analyser = this._context.createAnalyser();
     this._analyser.fftSize = this._bufferSize;
     this._binCount = this._analyser.frequencyBinCount; // this._bufferSize / 2
-    console.log(this._binCount);
+    //console.log( this._binCount )
 
     this._dataFreqArray = new Uint8Array(this._binCount);
     this._dataTimeArray = new Uint8Array(this._binCount);
@@ -416,7 +416,7 @@ var Xp = (function (_THREE$Object3D) {
 
       this.linePoint = new THREE.Geometry();
       this.linePoint2 = new THREE.Geometry();
-      for (var i = 0 - window.innerWidth / 8; i < window.innerWidth; i += 8) {
+      for (var i = 0 - window.innerWidth / 16; i < window.innerWidth; i += 8) {
         this.linePoint.vertices.push(new THREE.Vector3(i, 10, 20));
         this.linePoint2.vertices.push(new THREE.Vector3(i, 0, 20));
       }
@@ -443,7 +443,7 @@ var Xp = (function (_THREE$Object3D) {
       });
       for (var p = 0; p < particleCount; p++) {
 
-        var pX = (p % (this.lineLength - 1) - window.innerWidth / 8) * 1.1,
+        var pX = (p % (this.lineLength - 1) - window.innerWidth / 16) * 1.1,
             pY = Math.random() * 5,
             //Math.random() * 500 - 250,
         pZ = Math.random() * 5 + 17,
@@ -462,7 +462,7 @@ var Xp = (function (_THREE$Object3D) {
       THREE.MultiplyBlending
       THREE.CustomBlending */
 
-      var particleCount2 = 500;
+      var particleCount2 = 30;
       this.particles2 = new THREE.Geometry();
       var pMaterial2 = new THREE.PointCloudMaterial({
         map: part,
@@ -485,14 +485,14 @@ var Xp = (function (_THREE$Object3D) {
         attributes: {
           vertexOpacity: { type: 'f', value: 1 }
         },
-        vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = .9- position.x/2.0;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
-        fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nuniform sampler2D u_tex;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n  /*  //Ca tricote , ca tricote\n  if ( position.x < 10.0 && position.y < 20.0 ){\n    vec4 texture = texture2D( u_tex, position.xy);\n    gl_FragColor = texture;\n  }\n  else {\n    gl_FragColor = vec4(0.0);\n  }*/\n\n  gl_FragColor = vec4(.55, .6, 0.65,1.0-position.x);\n}\n",
+        vertexShader: "#define GLSLIFY 1\nuniform float time;\nuniform vec2 resolution;\n\nuniform float size;\nvarying vec2 particle;\nvarying vec3 vColor;\nvarying float xPos;\nvarying vec2 vUv;\nvoid main(){\n  vUv = uv;\n  gl_PointSize = .9 - position.x/3.0;\n  particle = vec2(position.xy);\n  vColor = vec3(position);\n  xPos = position.x;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position,1.0);\n}\n",
+        fragmentShader: "#define GLSLIFY 1\nuniform float time;\nvarying vec3 vColor;\nuniform vec2 resolution ;\nuniform sampler2D u_tex;\nvarying float xPos;\n//varying vec3 vColor;  // 'varying' vars are passed to the fragment shader\nvarying vec2 particle;\nvarying vec2 vUv;\nvoid main() { // pass the color to the fragment shader\n\n  vec2 uv = vUv;\n  vec2 position = (gl_FragCoord.xy / resolution.xy);\n\n  /*  //Ca tricote , ca tricote\n  if ( position.x < 10.0 && position.y < 20.0 ){\n    vec4 texture = texture2D( u_tex, position.xy);\n    gl_FragColor = texture;\n  }\n  else {\n    gl_FragColor = vec4(0.0);\n  }*/\n\n  gl_FragColor = vec4(.85, .9, 0.85,1.0-position.x/2.0);\n}\n",
         transparent: true
 
       });
 
       for (var p = 0; p < particleCount2; p++) {
-        var pX = (p % (this.lineLength - 1) - window.innerWidth / 12) * 1.5,
+        var pX = (p % (this.lineLength - 1) - window.innerWidth / 20) * 1.5,
             pY = Math.random() * 5,
             //Math.random() * 500 - 250,
         pZ = Math.random() * 5,
@@ -513,7 +513,7 @@ var Xp = (function (_THREE$Object3D) {
       var geometry = new THREE.BoxGeometry(20, 20, 20);
       var material = new THREE.MeshBasicMaterial({ color: 0xCCCCCC });
       this.object = new THREE.Mesh(geometry, material);
-      this.object.position.x -= window.innerWidth / 8 + 5;
+      this.object.position.x -= window.innerWidth / 16 + 5;
       this.object.position.z = 20;
       this.add(this.object);
 

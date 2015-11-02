@@ -20,5 +20,5 @@ void main() { // pass the color to the fragment shader
     gl_FragColor = vec4(0.0);
   }*/
 
-  gl_FragColor = vec4(.55, .6, 0.65,1.0-position.x);
+  gl_FragColor = vec4(.85, .9, 0.85,1.0-position.x/2.0);
 }

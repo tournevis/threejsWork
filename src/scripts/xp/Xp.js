@@ -49,7 +49,7 @@ class Xp extends THREE.Object3D {
 
     this.linePoint = new THREE.Geometry() ;
     this.linePoint2 = new THREE.Geometry() ;
-    for(var i = 0 -window.innerWidth/8  ; i < window.innerWidth; i+=8){
+    for(var i = 0 -window.innerWidth/16  ; i < window.innerWidth; i+=8){
       this.linePoint.vertices.push(new THREE.Vector3( i , 10, 20));
       this.linePoint2.vertices.push(new THREE.Vector3( i , 0, 20));
     }
@@ -76,7 +76,7 @@ class Xp extends THREE.Object3D {
     });
     for (var p = 0; p < particleCount; p++) {
 
-      var pX =(p %(this.lineLength-1 ) - window.innerWidth/8 )* 1.1,
+      var pX =(p %(this.lineLength-1 ) - window.innerWidth/16 )* 1.1,
           pY =  Math.random() * 5,//Math.random() * 500 - 250,
           pZ = Math.random() * 5 +17,
           particle = new THREE.Vector3(pX, pY, pZ);
@@ -99,7 +99,7 @@ class Xp extends THREE.Object3D {
       THREE.MultiplyBlending
       THREE.CustomBlending */
 
-      var particleCount2 = 500
+      var particleCount2 = 30
       this.particles2 = new THREE.Geometry()
         var pMaterial2 = new THREE.PointCloudMaterial({
         map: part,
@@ -129,7 +129,7 @@ class Xp extends THREE.Object3D {
     } );
 
       for (var p = 0; p < particleCount2; p++) {
-        var pX =(p %(this.lineLength-1 ) - window.innerWidth/12)*1.5,
+        var pX =(p %(this.lineLength-1 ) - window.innerWidth/20)*1.5,
             pY =  Math.random() * 5,//Math.random() * 500 - 250,
             pZ = Math.random() * 5 ,
             particle2 = new THREE.Vector3(pX, pY, pZ);
@@ -151,7 +151,7 @@ class Xp extends THREE.Object3D {
     var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 		var  material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC} );
   	this.object = new THREE.Mesh( geometry, material );
-    this.object.position.x -= window.innerWidth/8 +5;
+    this.object.position.x -= window.innerWidth/16 +5;
     this.object.position.z = 20;
 		this.add( this.object );
 
