@@ -16,7 +16,6 @@ var div = document.getElementById("startExp");
 var backDiv = document.getElementById("backStart");
 var play = 0;
 div.addEventListener("click", function(event){
-    console.log("click");
     if( play == 0){
       sound.load("mp3/ErikSatie_gymnopedie3.mp3");
       fade(div);

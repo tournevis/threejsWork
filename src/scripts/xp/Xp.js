@@ -44,7 +44,7 @@ class Xp extends THREE.Object3D {
       fragmentShader: glslify('../shader/lineFrag.glsl'),
       transparent: true
     });
-    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x32C0A5, opacity: 1, linewidth: 5} );
+    var lineMaterial = new THREE.LineBasicMaterial( { color: 0xD8DBE2, opacity: 1, linewidth: 5} );
 
 
     this.linePoint = new THREE.Geometry() ;
@@ -66,12 +66,12 @@ class Xp extends THREE.Object3D {
     var particleCount = this.nbPart
     this.particles = new THREE.Geometry()
       var pMaterial = new THREE.PointCloudMaterial({
-      map: part,
-      //color: 0xcccccc,
-      size:3,
+      //  map: part,
+      color: 0xcccccc,
+      size:10,
       blending: THREE.AdditiveBlending,
       transparent : true,
-      opacity : 1.0,
+      opacity : 0.5
       // depthTest: false
     });
     for (var p = 0; p < particleCount; p++) {
@@ -103,7 +103,7 @@ class Xp extends THREE.Object3D {
       this.particles2 = new THREE.Geometry()
         var pMaterial2 = new THREE.PointCloudMaterial({
         map: part,
-        color: 0x3D5A6C,
+        color: 0x58A4B0,
         size:8 ,
         blending: THREE.AdditiveBlending,
         transparent : true,
@@ -139,9 +139,9 @@ class Xp extends THREE.Object3D {
 
     // create the particle system
       this.particleSystem2 = new THREE.PointCloud(
-      this.particles2,
-      this.shaderMaterial);
-      this.add(this.particleSystem);
+        this.particles2,
+        this.shaderMaterial);
+      //this.add(this.particleSystem);
       this.add(this.particleSystem2);
 
     /*** GEOMETRY CUBE PART ***/
@@ -149,7 +149,7 @@ class Xp extends THREE.Object3D {
     this.speed = 0.01;
     this.sizeCube = 0;
     var geometry = new THREE.BoxGeometry( 20, 20, 20 );
-		var  material = new THREE.MeshBasicMaterial( { color: 0xACFCD9 } );
+		var  material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC} );
   	this.object = new THREE.Mesh( geometry, material );
     this.object.position.x -= window.innerWidth/8 +5;
     this.object.position.z = 20;
@@ -269,12 +269,12 @@ class Xp extends THREE.Object3D {
     this.iceCube.position.y = this.line.geometry.vertices[0].y;
     this.object.position.y = this.line.geometry.vertices[0].y;
 
-    this.line2.geometry.vertices[0].y = Math.sin( this.animSin)/2 * (average /freqSize )*0.2 +10
-    this.line2.geometry.vertices[0].z = Math.sin( this.animSin)/2 * (average /freqSize )*0.4
+    this.line2.geometry.vertices[0].y = Math.sin( this.animSin)/2 * (average /freqSize )*.6 +10
+    this.line2.geometry.vertices[0].z = Math.sin( this.animSin)/2 *0.4
     //this.line.geometry.vertices[0].y =  Perlin.noise(817)
     //console.log(this.line.geometry.vertices[0].y)
     //console.log();
-    
+
     /** MULTI CAMERA SETUP  **/
     engine.n =1;
 

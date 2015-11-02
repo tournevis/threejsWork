@@ -11,7 +11,7 @@ void main() { // pass the color to the fragment shader
   vec2 uv = vUv;
   vec2 position = (gl_FragCoord.xy / resolution.xy);
 
-  /*  //Ca tricote , ca tricote 
+  /*  //Ca tricote , ca tricote
   if ( position.x < 10.0 && position.y < 20.0 ){
     vec4 texture = texture2D( u_tex, position.xy);
     gl_FragColor = texture;
@@ -20,5 +20,5 @@ void main() { // pass the color to the fragment shader
     gl_FragColor = vec4(0.0);
   }*/
 
-  gl_FragColor = vec4(.5, 1.0, 0.7,1.0-position.x);
+  gl_FragColor = vec4(.55, .6, 0.65,1.0-position.x);
 }
