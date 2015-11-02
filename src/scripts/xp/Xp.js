@@ -15,7 +15,7 @@ class Xp extends THREE.Object3D {
 
     this.animSin = 0;
     this.nbPart = 1000;
-    console.log(" Particules Number : " + this.nbPart )
+    //console.log(" Particules Number : " + this.nbPart )
 
     /*** LIGHT PART  ***/
 
@@ -166,7 +166,7 @@ class Xp extends THREE.Object3D {
     this.iceCube.position.z = this.object.position.z;
     this.add(this.iceCube );
     function _cube( size ) {
-          console.log("CUBED")
+        //  console.log("CUBED")
   				var h = size * 0.5;
 
   				var geometry2 = new THREE.Geometry();

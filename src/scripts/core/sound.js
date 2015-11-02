@@ -13,7 +13,7 @@ class Sound extends Emitter {
     this._analyser = this._context.createAnalyser()
     this._analyser.fftSize = this._bufferSize
     this._binCount = this._analyser.frequencyBinCount // this._bufferSize / 2
-    console.log( this._binCount )
+    //console.log( this._binCount )
 
     this._dataFreqArray = new Uint8Array( this._binCount )
     this._dataTimeArray = new Uint8Array( this._binCount )
